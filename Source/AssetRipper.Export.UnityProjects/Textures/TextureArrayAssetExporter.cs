@@ -1,4 +1,4 @@
-﻿using AssetRipper.Assets;
+using AssetRipper.Assets;
 using AssetRipper.Export.Configuration;
 using AssetRipper.Export.Modules.Textures;
 using AssetRipper.Import.Logging;
@@ -34,43 +34,51 @@ public sealed class TextureArrayAssetExporter : BinaryAssetExporter
 	{
 		bool success;
 		DirectBitmap bitmap;
-		switch (asset)
+		try
 		{
-			case ICubemapArray cubemapArray:
-				{
-					if (!cubemapArray.CheckAssetIntegrity())
+			switch (asset)
+			{
+				case ICubemapArray cubemapArray:
 					{
-						WarnResourceFileNotFound(cubemapArray.Name, cubemapArray.StreamData);
-						return false;
+						if (!cubemapArray.CheckAssetIntegrity())
+						{
+							WarnResourceFileNotFound(cubemapArray.Name, cubemapArray.StreamData);
+							return false;
+						}
+						success = TextureConverter.TryConvertToBitmap(cubemapArray, out bitmap);
 					}
-					success = TextureConverter.TryConvertToBitmap(cubemapArray, out bitmap);
-				}
-				break;
-			case ITexture2DArray texture2DArray:
-				{
-					if (!texture2DArray.CheckAssetIntegrity())
+					break;
+				case ITexture2DArray texture2DArray:
 					{
-						WarnResourceFileNotFound(texture2DArray.Name, texture2DArray.StreamData);
-						return false;
+						if (!texture2DArray.CheckAssetIntegrity())
+						{
+							WarnResourceFileNotFound(texture2DArray.Name, texture2DArray.StreamData);
+							return false;
+						}
+						success = TextureConverter.TryConvertToBitmap(texture2DArray, out bitmap);
 					}
-					success = TextureConverter.TryConvertToBitmap(texture2DArray, out bitmap);
-				}
-				break;
-			case ITexture3D texture3D:
-				{
-					if (!texture3D.CheckAssetIntegrity())
+					break;
+				case ITexture3D texture3D:
 					{
-						WarnResourceFileNotFound(texture3D.Name, texture3D.StreamData);
-						return false;
+						if (!texture3D.CheckAssetIntegrity())
+						{
+							WarnResourceFileNotFound(texture3D.Name, texture3D.StreamData);
+							return false;
+						}
+						success = TextureConverter.TryConvertToBitmap(texture3D, out bitmap);
 					}
-					success = TextureConverter.TryConvertToBitmap(texture3D, out bitmap);
-				}
-				break;
-			default:
-				{
-					Logger.Log(LogType.Error, LogCategory.Export, $"Texture array '{asset}' has unsupported type '{asset.GetType().Name}'");
-				}
-				return false;
+					break;
+				default:
+					{
+						Logger.Log(LogType.Error, LogCategory.Export, $"Texture array '{asset}' has unsupported type '{asset.GetType().Name}'");
+					}
+					return false;
+			}
+		}
+		catch (Exception ex)
+		{
+			Logger.Log(LogType.Warning, LogCategory.Export, $"Failed to decode texture '{asset.Name}': {ex.Message}. Skipping texture export.");
+			return false;
 		}
 
 		if (success)
