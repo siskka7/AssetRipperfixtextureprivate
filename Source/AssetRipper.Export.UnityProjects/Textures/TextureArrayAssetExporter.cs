@@ -77,7 +77,7 @@ public sealed class TextureArrayAssetExporter : BinaryAssetExporter
 		}
 		catch (Exception ex)
 		{
-			Logger.Log(LogType.Warning, LogCategory.Export, $"Failed to decode texture '{asset.Name}': {ex.Message}. Skipping texture export.");
+			Logger.Log(LogType.Warning, LogCategory.Export, $"Failed to decode texture: {ex.Message}. Skipping texture export.");
 			return false;
 		}
 
