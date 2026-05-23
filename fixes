@@ -1,0 +1,3 @@
+Fixes:
+- TextureArray ASTC export crash (ArgumentOutOfRangeException in ASTC decoder)
+- Improved stability during large asset exports
